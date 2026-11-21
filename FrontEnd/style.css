@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin-top: 3rem;
+    place-items: center;
+}
+
+
+
+#wrapper {
+    border: 2px solid black;
+    height: 576px;
+    width: 1024px;
+    overflow: hidden;
+
+}
+
+#canvas1 {
+    background: url("pitch.jpg") center / 100% 100% no-repeat;
+
+}
