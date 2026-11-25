@@ -5,10 +5,10 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
-class Controller {
+class Controller {  //class that saves the keys pressed and is in association with the main play class
     constructor(game) {
-        this.game = game
-        this.game.key = {};
+        this.game = game //takes the address of Game class
+        this.game.key = {}; //stores all the key held down and up
         window.addEventListener('keydown', e => { 
         this.game.key[e.key] = "hold" });
 
@@ -18,7 +18,7 @@ class Controller {
 }
 
 
-class Car {
+class Car {  //also in association with Game the main brain of the game
     constructor(game, x, y, color) {
         this.game = game
         this.x = x
@@ -29,10 +29,10 @@ class Car {
     }
 
     drawit(ctx) {
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        ctx.beginPath()  //declares a new drawing
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2) //draws a circle
+        ctx.fillStyle = this.color; //takes the colour ready
+        ctx.fill(); //paints
     }
 }
 
@@ -99,15 +99,15 @@ class Booster {
 
 }
 
-class Play {
+class Game { // the main brain of the game takes the canvas dimension as parametre
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.controller = new Controller(this)
+        this.controller = new Controller(this) //calls these classes (nested)
         this.leftcar = new Car(this, 180, 335, 'red')
         this.rightcar = new Car(this, 1024-180, 335, 'lime')
     }
-    Render(ctx) {
+    Render(ctx) {  //method to draw from game instead of the other subclasses
         this.leftcar.drawit(ctx)
         this.rightcar.drawit(ctx)
     }
@@ -116,8 +116,8 @@ class Play {
 
 }
 
-const play = new Play(canvas.width, canvas.height)
-play.Render(ctx)
+const play = new Game(canvas.width, canvas.height)  //main code calling the class Game
+play.Render(ctx) //calling it method of drawing
 
 
 
