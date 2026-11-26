@@ -41,21 +41,21 @@ class Car {  //also in association with Game the main brain of the game
     }
 
     driveit() {  //method responsible to drive each vehicule
-        if (this.game.key['ArrowLeft']) {      //if arrowleft is held = true
+        if (this.game.key['a']) {      //if arrowleft is held = true
             this.game.leftcar.angle -= 0.03     //modifies the angle of the left car 
         }
-        if (this.game.key['ArrowRight']) {
+        if (this.game.key['d']) {
             this.game.leftcar.angle += 0.03
         }
 
         const left_cos = Math.cos(this.game.leftcar.angle)  //depending on the angle, the value will effect x axis
         const left_sin = Math.sin(this.game.leftcar.angle) //depending on the angle, the value will effect y axis
 
-        if (this.game.key['ArrowUp']) {   //moves forward
+        if (this.game.key['w']) {   //moves forward
             this.game.leftcar.vx += left_cos * 0.018;     // the value [-1 to 1] is multiplied by a const
             this.game.leftcar.vy += left_sin * 0.018;  // same but sharply add to y if angle is 90 or 270
         }
-        if (this.game.key['ArrowDown']) {
+        if (this.game.key['s']) {
             this.game.leftcar.vx -= left_cos * 0.01;
             this.game.leftcar.vy -= left_sin * 0.01;
         }
@@ -69,21 +69,21 @@ class Car {  //also in association with Game the main brain of the game
         this.game.leftcar.x += this.game.leftcar.vx;   //conbines both the speed while driving + while sliding
         this.game.leftcar.y += this.game.leftcar.vy;
 
-        if (this.game.key['a']) {
+        if (this.game.key['ArrowLeft']) {
             this.game.rightcar.angle -= 0.03
         }
-        if (this.game.key['d']) {
+        if (this.game.key['ArrowRight']) {
             this.game.rightcar.angle += 0.03
         }
 
         const right_cos = Math.cos(this.game.rightcar.angle)
         const right_sin = Math.sin(this.game.rightcar.angle)
 
-        if (this.game.key['s']) {
+        if (this.game.key['ArrowDown']) {
             this.game.rightcar.vx += right_cos * 0.01;
             this.game.rightcar.vy += right_sin * 0.01;
         }
-        if (this.game.key['w']) {   //equivalent to left vehicule's ArrowDown but moves forward for right vehicle
+        if (this.game.key['ArrowUp']) {   //equivalent to left vehicule's ArrowDown but moves forward for right vehicle
             this.game.rightcar.vx -= right_cos * 0.018;
             this.game.rightcar.vy -= right_sin * 0.018;
         }
