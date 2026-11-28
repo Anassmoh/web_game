@@ -5,6 +5,18 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
+const COURT_SRC = 'pitch.svg';
+const OVERLAY_SRC = 'overlay.svg'
+
+function loadImage(src) {
+    const img = new Image();
+    img.ready = false;
+    img.onload = () => { img.ready = true; };
+    img.onerror = () => console.error('Could not load image:', src);
+    img.src = src;
+    return img;
+}
+
 const arrows = {'left': 'ArrowLeft', 'right': 'ArrowRight', 'gas': 'ArrowUp', 'reverse': 'ArrowDown'}
 const wasd = {'left': 'a', 'right': 'd', 'gas': 'w', 'reverse': 's'}
 
@@ -33,6 +45,7 @@ class Car {  //also in association with Game the main brain of the game
         this.vx = 0;
         this.vy = 0;
         this.radius = 18;
+        this.bounce = 0.2;
 
        
         
@@ -144,7 +157,134 @@ const puck = new Puck(512, 335, 'green')
 puck.draw_puck(ctx);
 puck.movePuck();
 
+// The rink is the court in which the players will play the  game
 class Rink {
+    constructor(game) {
+        this.game = game;
+
+        // pitch and overlay measurements
+        this.width = 950;
+        this.height = 450;
+        this.overlayHeight = 480;
+        this.frontWall = 30;
+
+        // goal measurements
+        this.goalLineX = 60;    // distance from the edge of the pitch to the goal line
+        this.goalWidth = 120;   // distance between the goal posts
+        this.goalDepth = 40;    // the distance from the goal line to the back of the net
+
+        this.offsetX = (game.width - this.width) / 2;
+        this.offsetY = game.height - 20 - this.height;
+        this.overlayY = game.height - 20 - this.overlayHeight;
+
+        this.courtImg = loadImage(COURT_SRC);
+        this.overlayImg = loadImage(OVERLAY_SRC);
+
+        this.goalTop = this.offsetY + (this.height - this.goalWidth) / 2;
+        this.goalBottom = this.goalTop + this.goalWidth;
+
+        // the playable area
+        this.floorLeft = this.offsetX + this.goalLineX;
+        this.floorRight = this.offsetX + this.width - this.goalLineX;
+        this.floorTop = this.offsetY;
+        this.floorBottom = this.offsetY + this.height - this.frontWall;
+
+        const w = this.width, gx = this.goalLineX, d = this.goalDepth;
+        const t = this.goalTop, b = this.goalBottom, fb = this.floorBottom;
+        const gl = this.floorLeft, gr = this.floorRight;
+
+        // defining the walls for the puck
+        this.walls = [
+            // goal lines solid minus the area between the goal posts
+            {x1: gl,     y1: this.floorTop, x2: gl,     y2: t},
+            {x1: gl,     y1: b,             x2: gl,     y2: fb},
+            {x1: gr,     y1: this.floorTop, x2: gr,     y2: t},
+            {x1: gr,     y1: b,             x2: gr,     y2: fb},
+            // nets
+            {x1: gl,     y1: t,   x2: gl-d,     y2: t},
+            {x1: gl,     y1: b,   x2: gl-d,     y2: b},
+            {x1: gl-d,   y1: t,   x2: gl-d,     y2: b},
+            {x1: gr,     y1: t,   x2: gr+d,     y2: t},
+            {x1: gr,     y1: b,   x2: gr+d,     y2: b},
+            {x1: gr+d,   y1: t,   x2: gr+d,     y2: b},
+        ];
+    }
+
+    // Drawing the court
+    drawCourt(ctx) {
+        if (this.courtImg.ready) {
+            ctx.drawImage(this.courtImg, this.offsetX, this.offsetY, this.width, this.height);
+        }
+    }
+
+    // adding the overlay for a pseudo-3D effect
+    drawOverlay(ctx) {
+        if (this.overlayImg.ready) {
+            ctx.drawImage(this.overlayImg, this.offsetX, this.overlayY, this.width, this.overlayHeight);
+        }
+    }
+
+    // bounce
+    bounceOff(obj, nx, ny) {
+        const dot = obj.vx * nx + obj.vy * ny;
+        if (dot < 0) {
+            obj.vx -= (1 + obj.bounce) * dot * nx;
+            obj.vy -= (1 + obj.bounce) * dot * ny;
+        }
+    }
+
+    // collisions
+    collide(obj, enterNet = false) {
+        const or = obj.radius;
+
+        if (enterNet) {
+            this.collideWalls(obj);
+
+            // limiting the puck to the back of the nets
+            const minX = this.floorLeft - this.goalDepth + or;
+            const maxX = this.floorRight + this.goalDepth - or;
+            if (obj.x < minX) { obj.x = minX; this.bounceOff(obj,  1, 0); }
+            if (obj.x > maxX) { obj.x = maxX; this.bounceOff(obj, -1, 0); }
+        }
+        
+        // left and right wall stoppin the cars
+        else {
+            if (obj.x < this.floorLeft + or)  { obj.x = this.floorLeft + or;  this.bounceOff(obj,  1, 0); }
+            if (obj.x > this.floorRight - or) { obj.x = this.floorRight - or; this.bounceOff(obj, -1, 0); }
+        }
+
+        // top and bottom wall stoppin the cars
+        if (obj.y < this.floorTop + or)    { obj.y = this.floorTop + or;    this.bounceOff(obj, 0,  1); }
+        if (obj.y > this.floorBottom - or) { obj.y = this.floorBottom - or; this.bounceOff(obj, 0, -1); }
+    }
+
+    // the collision of the puck with the walls
+    collideWalls(obj) {
+        const or = obj.radius;
+
+        for (const s of this.walls) {
+            const sx = s.x2 - s.x1, sy = s.y2 - s.y1;
+            const k = Math.max(0, Math.min(1, ((obj.x - s.x1) * sx + (obj.y - s.y1) * sy) / (sx * sx + sy * sy)));
+            const qx = s.x1 + k * sx, qy = s.y1 + k * sy;
+            const ox = obj.x - qx, oy = obj.y - qy;
+            const dist = Math.hypot(ox, oy);
+
+            if (dist < or && dist > 0) {
+                const nx = ox / dist, ny = oy / dist;
+                obj.x = qx + nx * or;
+                obj.y = qy + ny * or;
+                this.bounceOff(obj, nx, ny);
+            }
+        }
+    }
+
+    checkGoal(puck) {
+        if (puck.y < this.goalTop || puck.y > this.goalBottom) return null;
+        if (puck.x < this.floorLeft && puck.x > this.floorLeft - this.goalDepth) return 'left';
+        const rx = this.floorRight;
+        if (puck.x > rx && puck.x < rx + this.goalDepth) return 'right';
+        return null;
+}
 
 }
 
@@ -162,14 +302,19 @@ class Game { // the main brain of the game takes the canvas dimension as paramet
         this.height = height;
         this.ctx = ctx
         this.controller = new Controller(this) //calls these classes (nested)
+        this.rink = new Rink(this);
         this.leftcar = new Car(this, 180, 335, 'red', 0, wasd)
         this.rightcar = new Car(this, 844, 335, 'lime', Math.PI, arrows)
     }
     Render() {  //method to draw from game instead of the other subclasses
+        this.rink.drawCourt(this.ctx)
         this.leftcar.drawit(this.ctx)
         this.rightcar.drawit(this.ctx)
         this.leftcar.driveit()  //keeep rendering in new positions
         this.rightcar.driveit()
+        this.rink.collide(this.leftcar)
+        this.rink.collide(this.rightcar)
+        this.rink.drawOverlay(this.ctx)
     }
 
 
