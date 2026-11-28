@@ -20,6 +20,6 @@ body {
 }
 
 #canvas1 {
-    background: url("pitch.png") center / 100% 100% no-repeat;
-
-}
+    display: block;
+    background: #aecbcb; /* changed the image to color and these images are now defined inside the JS File*/
+    }
