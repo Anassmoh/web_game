@@ -1,0 +1,268 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #101522;
+    font-family: Arial, sans-serif;
+}
+
+#wrapper {
+    position: relative;
+    width: 1024px;
+    height: 576px;
+    overflow: hidden;
+    border: 3px solid #222;
+    border-radius: 12px;
+}
+
+#canvas1 {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: url("pitch.png") center / 100% 100% no-repeat;
+}
+
+/* COMMON SCREENS */
+
+.screen {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    color: white;
+    background: rgba(8, 19, 35, 0.94);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* MAIN MENU */
+
+.menu-header {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    font-size: 23px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    border-bottom: 2px solid rgba(255,255,255,0.4);
+}
+
+.rink-decoration {
+    position: relative;
+    width: 82%;
+    height: 390px;
+    margin-top: 20px;
+    border: 3px solid rgba(255,255,255,0.7);
+    border-radius: 100px;
+    background: rgba(190, 225, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rink-decoration::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 2px solid rgba(255,255,255,0.25);
+}
+
+.rink-decoration::after {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* GAME TITLE */
+
+.game-title {
+    text-align: center;
+    margin-top: 55px;
+    z-index: 2;
+}
+
+.game-title h1 {
+    font-size: 48px;
+    letter-spacing: 5px;
+    text-shadow: 3px 3px 5px black;
+}
+
+.game-title p {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #b7dfff;
+    margin-top: 8px;
+}
+
+/* DECORATIVE PADDLES */
+
+.paddle {
+    position: absolute;
+    top: 45px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    z-index: 2;
+    border: 5px solid white;
+    box-shadow: 0 0 15px currentColor;
+}
+
+.blue-paddle {
+    left: 35px;
+    background: #168dff;
+    color: #168dff;
+}
+
+.red-paddle {
+    right: 35px;
+    background: #ff4545;
+    color: #ff4545;
+}
+
+/* MENU BUTTONS */
+
+.menu-buttons {
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 35px;
+}
+
+.menu-buttons button,
+.screen button {
+    min-width: 250px;
+    padding: 12px 20px;
+    border: 2px solid white;
+    border-radius: 30px;
+    background: #162c48;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.menu-buttons button:hover,
+.screen button:hover {
+    background: #168dff;
+    transform: scale(1.05);
+}
+
+/* PLAYER SELECTION */
+
+.screen > h1 {
+    margin-top: 35px;
+    margin-bottom: 25px;
+    letter-spacing: 3px;
+    font-size: 30px;
+}
+
+.name-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.player-card {
+    width: 340px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px;
+    background: #1d293b;
+    border: 2px solid;
+}
+
+.red-card {
+    border-color: #ff4545;
+}
+
+.blue-card {
+    border-color: #168dff;
+}
+
+.player-card h2 {
+    margin-bottom: 15px;
+    font-size: 17px;
+}
+
+.red-card h2 {
+    color: #ff5555;
+}
+
+.blue-card h2 {
+    color: #35a8ff;
+}
+
+.player-card input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+    font-size: 14px;
+}
+
+.movement-controls {
+    margin-top: 20px;
+    padding: 12px;
+    background: #101d30;
+    border-radius: 8px;
+}
+
+.movement-controls h3 {
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #b7c8dc;
+}
+
+.movement-controls p {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.movement-controls span {
+    font-size: 12px;
+    color: #b7c8dc;
+}
+
+/* LEADERBOARD */
+
+.leaderboard-content {
+    margin: 25px;
+    padding: 30px;
+    min-width: 350px;
+    text-align: center;
+    background: #243b58;
+    border-radius: 10px;
+}
+
+/* EXIT */
+
+#exitScreen > p {
+    margin-bottom: 30px;
+    color: #b7c8dc;
+}

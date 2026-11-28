@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ice Hockey</title>
+
+    <link href="style.css" rel="stylesheet">
+
+    <script src="run.js" defer></script>
+    <script src="menu.js" defer></script>
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <canvas id="canvas1" width="1024" height="576"></canvas>
+
+        <!-- MAIN MENU -->
+        <section id="mainMenu" class="screen">
+
+            <header class="menu-header">
+                MAIN MENU
+            </header>
+
+            <div class="rink-decoration">
+
+                <!-- Decorative paddles -->
+                <div class="paddle blue-paddle"></div>
+                <div class="paddle red-paddle"></div>
+
+                <div class="game-title">
+                    <h1>GTS: PUCK IT</h1>
+                    <p>PLAY . SCORE . WIN</p>
+                </div>
+
+                <div class="menu-buttons">
+
+                    <button id="playButton">
+                        ▶ PLAY GAME
+                    </button>
+
+                    <button id="leaderboardButton">
+                        🏆 LEADERBOARD
+                    </button>
+
+                    <button id="exitButton">
+                        ⇥ EXIT
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PLAYER SELECTION -->
+        <section id="playerScreen" class="screen hidden">
+
+            <h1>CHOOSE YOUR PLAYERS</h1>
+
+            <div class="name-inputs">
+
+                <div class="player-card red-card">
+
+                    <h2>PLAYER 1 - RED</h2>
+
+                    <input
+                        type="text"
+                        id="player1Name"
+                        placeholder="Enter player 1 name"
+                        maxlength="15"
+                    >
+
+                    <div class="movement-controls">
+                        <h3>CONTROLS</h3>
+                        <p>W A S D</p>
+                        <span>Use WASD to move</span>
+                    </div>
+
+                </div>
+
+
+                <div class="player-card blue-card">
+
+                    <h2>PLAYER 2 - BLUE</h2>
+
+                    <input
+                        type="text"
+                        id="player2Name"
+                        placeholder="Enter player 2 name"
+                        maxlength="15"
+                    >
+
+                    <div class="movement-controls">
+                        <h3>CONTROLS</h3>
+                        <p>↑ ↓ ← →</p>
+                        <span>Use Arrow Keys to move</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button id="beginButton">
+                START MATCH
+            </button>
+
+            <button id="backButton">
+                BACK
+            </button>
+
+        </section>
+
+
+        <!-- LEADERBOARD -->
+        <section id="leaderboardScreen" class="screen hidden">
+
+            <h1>🏆 LEADERBOARD</h1>
+
+            <div class="leaderboard-content">
+                <p>No scores recorded yet.</p>
+            </div>
+
+            <button id="leaderboardBackButton">
+                BACK TO MENU
+            </button>
+
+        </section>
+
+
+        <!-- EXIT SCREEN -->
+        <section id="exitScreen" class="screen hidden">
+
+            <h1>THANKS FOR PLAYING!</h1>
+
+            <p>See you on the rink.</p>
+
+            <button id="returnButton">
+                BACK TO MENU
+            </button>
+
+        </section>
+
+    </div>
+
+</body>
+</html>
