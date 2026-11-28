@@ -21,5 +21,5 @@ body {
 
 #canvas1 {
     display: block;
-    background: #aecbcb; /* changed the image to color the images are defined in the JS File*/
+    background: #aecbcb; /* changed the image to color and these images are now defined inside the JS File*/
     }
