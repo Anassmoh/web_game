@@ -52,12 +52,7 @@ class Car {  //also in association with Game the main brain of the game
 
         ctx.drawImage(this.image, frame * framesw, 0, framesw, framesh, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 
-        
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + Math.cos(this.angle) * 40, this.y + Math.sin(this.angle) * 40);
-        ctx.strokeStyle = 'yellow';
-        ctx.stroke();
+    
     }
 
     driveit() {  //method responsible to drive each vehicule
