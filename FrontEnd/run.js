@@ -5,6 +5,9 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
+const arrows = {'left': 'ArrowLeft', 'right': 'ArrowRight', 'gas': 'ArrowUp', 'reverse': 'ArrowDown'}
+const wasd = {'left': 'a', 'right': 'd', 'gas': 'w', 'reverse': 's'}
+
 class Controller {  //class that saves the keys pressed and is in association with the main play class
     constructor(game) {
         this.game = game //takes the address of Game class
@@ -20,85 +23,73 @@ class Controller {  //class that saves the keys pressed and is in association wi
 
 
 class Car {  //also in association with Game the main brain of the game
-    constructor(game, x, y, color) {
-        this.game = game
-        this.x = x
-        this.y = y
+    constructor(game, x, y, color, angle, keys) {
+        this.game = game;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.angle = angle;
+        this.keys = keys
         this.vx = 0;
         this.vy = 0;
-        this.angle = 0;
-        this.color = color
         this.radius = 18;
+
+       
         
     }
     
 
     drawit(ctx) {
+       
+
         ctx.beginPath()  //declares a new drawing
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2) //draws a circle
         ctx.fillStyle = this.color; //takes the colour ready
         ctx.fill(); //paints
+
     }
 
     driveit() {  //method responsible to drive each vehicule
-        if (this.game.key['ArrowLeft']) {      //if arrowleft is held = true
-            this.game.leftcar.angle -= 0.03     //modifies the angle of the left car 
+        //console.log("drive")
+        const key = this.game.key
+        if (key[this.keys.right]) {      //if arrowleft is held = true
+            this.angle += 0.07     //modifies the angle of the left car 
         }
-        if (this.game.key['ArrowRight']) {
-            this.game.leftcar.angle += 0.03
-        }
-
-        const left_cos = Math.cos(this.game.leftcar.angle)  //depending on the angle, the value will effect x axis
-        const left_sin = Math.sin(this.game.leftcar.angle) //depending on the angle, the value will effect y axis
-
-        if (this.game.key['ArrowUp']) {   //moves forward
-            this.game.leftcar.vx += left_cos * 0.018;     // the value [-1 to 1] is multiplied by a const
-            this.game.leftcar.vy += left_sin * 0.018;  // same but sharply add to y if angle is 90 or 270
-        }
-        if (this.game.key['ArrowDown']) {
-            this.game.leftcar.vx -= left_cos * 0.01;
-            this.game.leftcar.vy -= left_sin * 0.01;
-        }
-       
-        const left_offgas = this.game.leftcar.vx * left_cos + this.game.leftcar.vy * left_sin  //combines both vx and vy into 1 speed
-        this.game.leftcar.vx += (left_cos * left_offgas - this.game.leftcar.vx) * 0.2;    // so turning will happen even if arrowup is not pressed
-        this.game.leftcar.vy += (left_sin * left_offgas - this.game.leftcar.vy) * 0.2;  // without it only angle moves but not the vehicule while sliding
-
-        
-        
-        this.game.leftcar.x += this.game.leftcar.vx;   //conbines both the speed while driving + while sliding
-        this.game.leftcar.y += this.game.leftcar.vy;
-
-        if (this.game.key['a']) {
-            this.game.rightcar.angle -= 0.03
-        }
-        if (this.game.key['d']) {
-            this.game.rightcar.angle += 0.03
+        if (key[this.keys.left]) {
+            this.angle -= 0.07
         }
 
-        const right_cos = Math.cos(this.game.rightcar.angle)
-        const right_sin = Math.sin(this.game.rightcar.angle)
+        const cosinus = Math.cos(this.angle)  //depending on the angle, the value will effect x axis
+        const sinus = Math.sin(this.angle) //depending on the angle, the value will effect y axis
 
-        if (this.game.key['s']) {
-            this.game.rightcar.vx += right_cos * 0.01;
-            this.game.rightcar.vy += right_sin * 0.01;
+        if (key[this.keys.gas]) {   //moves forward
+            this.vx += cosinus * 0.09;     // the value [-1 to 1] is multiplied by a const
+            this.vy += sinus * 0.09;  // same but sharply add to y if angle is 90 or 270
         }
-        if (this.game.key['w']) {   //equivalent to left vehicule's ArrowDown but moves forward for right vehicle
-            this.game.rightcar.vx -= right_cos * 0.018;
-            this.game.rightcar.vy -= right_sin * 0.018;
+        if (key[this.keys.reverse]) {
+            this.vx -= cosinus * 0.07;
+            this.vy -= sinus * 0.07;
         }
        
-        const right_offgas = this.game.rightcar.vx * right_cos + this.game.rightcar.vy * right_sin
-        this.game.rightcar.vx += (right_cos * right_offgas - this.game.rightcar.vx) * 0.2;    
-        this.game.rightcar.vy += (right_sin * right_offgas - this.game.rightcar.vy) * 0.2;
+        const offgas = this.vx * cosinus + this.vy * sinus  //combines both vx and vy into 1 speed
+        this.vx += (cosinus * offgas - this.vx) * 0.1;    // so turning will happen even if arrowup is not pressed
+        this.vy += (sinus * offgas - this.vy) * 0.1;  // without it only angle moves but not the vehicule while sliding
 
-        this.vx *= 0.985  //keeps shrinking vx each frame by 98.5% till almost full stop
-        this.vy *= 0.985  //so it mimics a sliding effect, without it car will keep driving based on last speed recorded
         
-        this.game.rightcar.x += this.game.rightcar.vx;
-        this.game.rightcar.y += this.game.rightcar.vy;
+        
+        this.x += this.vx;   //conbines both the speed while driving + while sliding
+        this.y += this.vy;
 
-
+        this.vx *= 0.98  //keeps shrinking vx each frame by 98.5% till almost full stop
+        this.vy *= 0.98;  //so it mimics a sliding effect, without it car will keep driving based on last speed recorded
+        
+        
+        if (Math.hypot(this.vx, this.vy) < 0.03) {  //stops the car since the friction multiplication never goes to 0;
+            this.vx = 0; //so if speed goes too small, it will do a full stop eventually
+            this.vy = 0;
+        } return true
+        
+        
     }
 }
 
@@ -166,29 +157,33 @@ class Booster {
 }
 
 class Game { // the main brain of the game takes the canvas dimension as parametre
-    constructor(width, height) {
+    constructor(width, height, ctx) {
         this.width = width;
         this.height = height;
+        this.ctx = ctx
         this.controller = new Controller(this) //calls these classes (nested)
-        this.leftcar = new Car(this, 180, 335, 'red')
-        this.rightcar = new Car(this, 1024-180, 335, 'lime')
+        this.leftcar = new Car(this, 180, 335, 'red', 0, wasd)
+        this.rightcar = new Car(this, 844, 335, 'lime', Math.PI, arrows)
     }
-    Render(ctx) {  //method to draw from game instead of the other subclasses
-        this.leftcar.drawit(ctx)
-        this.rightcar.drawit(ctx)
+    Render() {  //method to draw from game instead of the other subclasses
+        this.leftcar.drawit(this.ctx)
+        this.rightcar.drawit(this.ctx)
         this.leftcar.driveit()  //keeep rendering in new positions
         this.rightcar.driveit()
     }
-        
 
+
+        
 
 
 }
 
-const play = new Game(canvas.width, canvas.height)  //main code calling the class Game
-function animate() {
+const play = new Game(canvas.width, canvas.height, ctx)  //main code calling the class Game
+function animate() {  
     ctx.clearRect(0, 0, canvas.width, canvas.height)  //this clears last drawing of vehicule, without it the car pattern will be shown.
-    play.Render(ctx) //calling it method of drawing
+    play.Render() //calling it method of drawing
+    console.log("p")
+    
     requestAnimationFrame(animate)   //this windows object or method refreshes the screen to show movement
 }
 animate()
