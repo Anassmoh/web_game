@@ -50,7 +50,7 @@ class Car {  //also in association with Game the main brain of the game
         this.height = 37.2;
         this.image = new Image();
         this.image.src = image;
-        this.radius = 18;
+        this.radius = 20;
         this.bounce = 0.2;
 
        
@@ -312,6 +312,35 @@ class Game { // the main brain of the game takes the canvas dimension as paramet
         this.rightcar = new Car(this, 844, 335, 'right_car.png', Math.PI, arrows)
         
     }
+
+    carCollision() {
+        const distance_x = this.rightcar.x - this.leftcar.x;
+        const distance_y = this.rightcar.y - this.leftcar.y;
+        const distance = Math.hypot(distance_x, distance_y);
+        const minDistance = this.leftcar.radius + this.rightcar.radius;
+
+        if (distance >= minDistance || distance === 0) return;   
+
+        const unit_vector_x = distance_x / distance;
+        const unit_vector_y = distance_y / distance;
+
+        const overlap = minDistance - distance;
+        this.leftcar.x -= unit_vector_x * overlap / 2;
+        this.leftcar.y -= unit_vector_y * overlap / 2;
+        this.rightcar.x += unit_vector_x * overlap / 2;
+        this.rightcar.y += unit_vector_y * overlap / 2;
+
+        const cartocarspeed = (this.leftcar.vx - this.rightcar.vx) * unit_vector_x + (this.leftcar.vy - this.rightcar.vy) * unit_vector_y;
+        if (cartocarspeed <= 0) return;                               
+
+        
+        const bounce_speed = cartocarspeed * 0.9;
+        this.leftcar.vx -= bounce_speed * unit_vector_x;
+        this.leftcar.vy -= bounce_speed * unit_vector_y;
+        this.rightcar.vx += bounce_speed * unit_vector_x;
+        this.rightcar.vy += bounce_speed * unit_vector_y;
+    }
+
     Render() {  //method to draw from game instead of the other subclasses
         this.rink.drawCourt(this.ctx)
         this.leftcar.drawit(this.ctx)
@@ -321,8 +350,10 @@ class Game { // the main brain of the game takes the canvas dimension as paramet
         this.rink.collide(this.leftcar)
         this.rink.collide(this.rightcar)
         this.rink.drawOverlay(this.ctx)
+        this.carCollision()
     }
 
+    
 
         
 
