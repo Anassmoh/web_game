@@ -5,6 +5,10 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
+const frames = 8;      //sprite images
+const framesw = 430;    
+const framesh = 320;
+
 const arrows = {'left': 'ArrowLeft', 'right': 'ArrowRight', 'gas': 'ArrowUp', 'reverse': 'ArrowDown'}
 const wasd = {'left': 'a', 'right': 'd', 'gas': 'w', 'reverse': 's'}
 
@@ -23,16 +27,19 @@ class Controller {  //class that saves the keys pressed and is in association wi
 
 
 class Car {  //also in association with Game the main brain of the game
-    constructor(game, x, y, color, angle, keys) {
+    constructor(game, x, y, image, angle, keys) {
         this.game = game;
         this.x = x;
         this.y = y;
-        this.color = color;
         this.angle = angle;
         this.keys = keys
         this.vx = 0;
         this.vy = 0;
-        this.radius = 18;
+        this.radius = 24;
+        this.width = 60;
+        this.height = 44.7;
+        this.image = new Image();
+        this.image.src = image;
 
        
         
@@ -40,19 +47,23 @@ class Car {  //also in association with Game the main brain of the game
     
 
     drawit(ctx) {
-       
+        const a = ((this.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);           // angle kept between 0 and 2π
+        const frame = Math.round(a / ((Math.PI * 2) / frames)) % frames;      // nearest of the 8 frames
 
-        ctx.beginPath()  //declares a new drawing
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2) //draws a circle
-        ctx.fillStyle = this.color; //takes the colour ready
-        ctx.fill(); //paints
+        ctx.drawImage(this.image, frame * framesw, 0, framesw, framesh, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + Math.cos(this.angle) * 40, this.y + Math.sin(this.angle) * 40);
+        ctx.strokeStyle = 'yellow';
+        ctx.stroke();
     }
 
     driveit() {  //method responsible to drive each vehicule
         //console.log("drive")
         const key = this.game.key
-        if (key[this.keys.right]) {      //if arrowleft is held = true
+        if (key[this.keys.right]) {      //if arrowleft or a is held = true
             this.angle += 0.07     //modifies the angle of the left car 
         }
         if (key[this.keys.left]) {
@@ -162,8 +173,8 @@ class Game { // the main brain of the game takes the canvas dimension as paramet
         this.height = height;
         this.ctx = ctx
         this.controller = new Controller(this) //calls these classes (nested)
-        this.leftcar = new Car(this, 180, 335, 'red', 0, wasd)
-        this.rightcar = new Car(this, 844, 335, 'lime', Math.PI, arrows)
+        this.leftcar = new Car(this, 180, 335, 'right_car.png', 0, wasd)
+        this.rightcar = new Car(this, 844, 335, 'right_car.png', Math.PI, arrows)
     }
     Render() {  //method to draw from game instead of the other subclasses
         this.leftcar.drawit(this.ctx)
